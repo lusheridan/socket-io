@@ -5,8 +5,8 @@ const contenedor = new Contenedor("./productos.txt");
 
 const app = express()
 const PORT = 8080
-app.listen(8080)
-console.log(`Servidor Http escucnado en: http://localhost:${PORT}`)
+app.listen(PORT)
+console.log(`Servidor HTTP escuchando en: http://localhost:${PORT}`)
 
 app.get ('/productos', async (req, res) => {
   res.send(await contenedor.getAll())
