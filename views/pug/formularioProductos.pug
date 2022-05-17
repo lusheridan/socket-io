@@ -1,0 +1,34 @@
+html
+head
+  title Agregar Producto - PUG
+  meta(charset="UTF-8")
+  meta(http-equiv="X-UA-Compatible" content="IE=edge")
+  meta(name="viewport" content="width=device-width, initial-scale=1.0")
+  link(href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous")
+body
+  div.container.m-3.p-3
+    h1.m-2 Crear Producto
+    div.m-4
+      form(action="/productos/create" method="post")
+        div.mb-3
+          label.form-label(for="title")
+            i 
+              strong Nombre
+          input(type="text" class="form-control" id="nombre" name="title")
+        div.mb-3
+          label.form-label(for="price")
+            i   
+              strong Precio 
+          input(type="number" min="0" step="0.01" class="form-control" name="price")
+        div.mb-3
+          label.form-label(for="thumbnail")
+            i 
+              strong Img URL 
+          input(type="text" class="form-control" id="nombre" name="thumbnail")
+        button.btn.btn-success(type="submit") 
+          strong Crear
+      div.mt-3
+        a(href="/productos")
+          button.btn.btn-primary 
+            strong Lista de Productos
+  script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous")
