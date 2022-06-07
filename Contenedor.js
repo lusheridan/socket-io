@@ -1,25 +1,14 @@
-const { promises: fs } = require("fs");
+const knex = require("knex");
 
 class Contenedor {
-  constructor(fileName) {
-    this.fileName = fileName;
+  constructor(options, table) {
+    this.knex = knex(options);
+    this.table = table;
   }
 
   async save(record) {
-    const records = await this.getAll();
-    let newId;
-
-    if (records.length > 0) {
-      newId = records[records.length - 1].id + 1;
-    } else {
-      newId = 1;
-    }
-
-    const newRecord = { ...record, id: newId };
-    records.push(newRecord);
-
     try {
-      await fs.writeFile(this.fileName, JSON.stringify(records, null, 2));
+      const newRecord = await this.knex(this.table).insert(record);
       return newRecord;
     } catch (error) {
       throw new Error(`Error al guardar: ${error}`);
@@ -27,49 +16,41 @@ class Contenedor {
   }
 
   async getById(id) {
-    const records = await this.getAll();
-    const record = records.find((x) => x.id === id);
-    return record;
+    const getById = await this.knex
+      .from(this.table)
+      .select("*")
+      .where("id", id);
+    return getById;
   }
 
   async getAll() {
     try {
-      const records = await fs.readFile(this.fileName, "utf-8");
-      return JSON.parse(records);
+      const getAll = await this.knex.from(this.table).select("*");
+      return getAll;
     } catch (error) {
       return [];
     }
   }
 
   async editById(id, newValues) {
-    const records = await this.getAll();
-    const index = records.findIndex((x) => x.id === id);
-
-    if (index >= 0 && index < records.length) {
-      records[index] = { ...records[index], ...newValues };
-
-      try {
-        await fs.writeFile(this.fileName, JSON.stringify(records, null, 2));
-        return records[index];
-      } catch (error) {
-        throw new Error(`Error al actualizar: ${error}`);
-      }
+    try {
+      const records = await this.knex
+        .from(this.table)
+        .where("id", id)
+        .update(newValues);
+      return records;
+    } catch (error) {
+      throw new Error(`Error al actualizar: ${error}`);
     }
   }
 
   async deleteById(id) {
     try {
-      const records = await this.getAll();
-      const index = records.indexOf(records.find((x) => x.id === id));
-
-      if (index === -1) {
-        return false;
-      }
-
-      records.splice(index, 1);
-      await fs.writeFile(this.fileName, JSON.stringify(records, null, 2));
-
-      return true;
+      const deletedRecord = await this.knex
+        .from(this.table)
+        .where("id", id)
+        .del();
+      return deletedRecord;
     } catch (error) {
       throw new Error(`Error al borrar Id ${id}: ${error}`);
     }
@@ -77,7 +58,8 @@ class Contenedor {
 
   async deleteAll() {
     try {
-      await fs.writeFile(this.fileName, JSON.stringify([], null, 2));
+      const deletedRecords = await this.knex.from(this.table).select("*").del();
+      return deletedRecords;
     } catch (error) {
       throw new Error(`Error al borrar todo: ${error}`);
     }

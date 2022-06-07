@@ -1,8 +1,9 @@
 const { Router } = require("express");
 const Contenedor = require("../contenedor");
+const options = require("../dataBase/configDB");
 
 const router = Router();
-const contenedor = new Contenedor("./productos.json");
+const contenedor = new Contenedor(options.mariaDB, "productos");
 
 router.get("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
@@ -24,6 +25,16 @@ router.delete("/:id", async (req, res) => {
   }
 
   res.json({ message: "producto borrado" });
+});
+
+router.delete("/", async (req, res) => {
+  const result = await contenedor.deleteAll();
+
+  if (!result) {
+    return res.json({ error: "no hay productos" }, 404);
+  }
+
+  res.json({ message: "productos borrados" });
 });
 
 router.put("/:id", async (req, res) => {

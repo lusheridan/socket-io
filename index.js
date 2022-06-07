@@ -1,39 +1,53 @@
 const express = require("express");
+const { Server: ioServer } = require("socket.io");
 const router = require("./routes/index");
+const app = express();
+const http = require("http");
+const dayjs = require("dayjs");
+const options = require("./dataBase/configDB");
+const httpServer = http.createServer(app);
+const io = new ioServer(httpServer);
+
+const PORT = 8080;
+httpServer.listen(PORT, () => {
+  console.log(`Server on port ${PORT}`);
+});
 
 const Contenedor = require("./Contenedor");
-const contenedor = new Contenedor("./productos.json");
 
-const app = express();
-const PORT = 8080;
+const productContainer = new Contenedor(options.mariaDB, "productos");
+const messagesContainer = new Contenedor(options.sqlite, "mensajes");
 
-app.set("view engine", "pug");
+app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api", router);
 app.use("/", express.static(__dirname + "/public"));
 
-const routerPug = express.Router();
+io.on("connection", async (socket) => {
+  console.log("nuevo cliente conectado:", socket.id);
 
-routerPug.get("/productos/create", async (req, res) => {
-  res.render(`${__dirname}/views/pug/formularioProductos.pug`);
+  socket.emit("messages", await messagesContainer.getAll());
+
+  socket.on("newProduct", async (product) => {
+    await productContainer.save(product);
+    io.sockets.emit("products", productContainer);
+  });
+
+  socket.on("newMessage", async (message) => {
+    await messagesContainer.save({
+      ...message,
+      date: dayjs().format("D/MM/YYYY hh:mm:ss"),
+    });
+    io.sockets.emit("messages", await messagesContainer.getAll());
+  });
 });
 
-routerPug.get("/productos", async (req, res) => {
-  const listaProductos = await contenedor.getAll();
-  res.render(`${__dirname}/views/pug/listaProductos.pug`, { listaProductos });
+const routerEjs = express.Router();
+
+routerEjs.get("/productos", async (req, res) => {
+  const listaProductos = await productContainer.getAll();
+  res.render(`${__dirname}/views/ejs/listaProductos.ejs`, { listaProductos });
 });
 
-routerPug.post("/productos/create", async (req, res) => {
-  const productos = req.body;
-  await contenedor.save(productos);
-  res.redirect("/productos");
-});
-
-app.use("/", routerPug);
-
-const server = app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
-
-server.on("error", (error) => console.log("Server error", error));
+app.use("/", routerEjs);
