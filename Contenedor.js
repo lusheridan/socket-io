@@ -1,44 +1,40 @@
-const knex = require("knex");
+const config = require("./config");
+const mongoose = require("mongoose");
 
-class Contenedor {
-  constructor(options, table) {
-    this.knex = knex(options);
-    this.table = table;
+mongoose.connect(config.mongoDB.URL, config.mongoDB.options);
+
+class ContenedorMongo {
+  constructor(collectionName, docSchema) {
+    this.collection = mongoose.model(collectionName, docSchema);
+  }
+
+  async getAll() {
+    try {
+      const records = await this.collection.find({});
+      return records;
+    } catch (error) {
+      return [];
+    }
+  }
+
+  async getById(id) {
+    const record = await this.collection.findOne({ _id: id });
+    return record;
   }
 
   async save(record) {
     try {
-      const newRecord = await this.knex(this.table).insert(record);
+      const newRecord = await this.collection.create(record);
       return newRecord;
     } catch (error) {
       throw new Error(`Error al guardar: ${error}`);
     }
   }
 
-  async getById(id) {
-    const getById = await this.knex
-      .from(this.table)
-      .select("*")
-      .where("id", id);
-    return getById;
-  }
-
-  async getAll() {
-    try {
-      const getAll = await this.knex.from(this.table).select("*");
-      return getAll;
-    } catch (error) {
-      return [];
-    }
-  }
-
   async editById(id, newValues) {
     try {
-      const records = await this.knex
-        .from(this.table)
-        .where("id", id)
-        .update(newValues);
-      return records;
+      await this.collection.updateOne({ _id: id }, newValues);
+      return newValues;
     } catch (error) {
       throw new Error(`Error al actualizar: ${error}`);
     }
@@ -46,24 +42,13 @@ class Contenedor {
 
   async deleteById(id) {
     try {
-      const deletedRecord = await this.knex
-        .from(this.table)
-        .where("id", id)
-        .del();
-      return deletedRecord;
+      const result = await this.collection.deleteOne({ _id: id });
+
+      return !!result.deletedCount;
     } catch (error) {
       throw new Error(`Error al borrar Id ${id}: ${error}`);
     }
   }
-
-  async deleteAll() {
-    try {
-      const deletedRecords = await this.knex.from(this.table).select("*").del();
-      return deletedRecords;
-    } catch (error) {
-      throw new Error(`Error al borrar todo: ${error}`);
-    }
-  }
 }
 
-module.exports = Contenedor;
+module.exports = ContenedorMongo;

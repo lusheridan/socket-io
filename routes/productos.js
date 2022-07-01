@@ -1,13 +1,15 @@
 const { Router } = require("express");
-const Contenedor = require("../contenedor");
-const options = require("../dataBase/configDB");
-
+const { productContainer } = require("../daos");
+const { getProductosFaker } = require("../productosFaker");
 const router = Router();
-const contenedor = new Contenedor(options.mariaDB, "productos");
+
+router.get("/productos-test", (req, res) => {
+  return res.json(getProductosFaker());
+});
 
 router.get("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
-  const productos = await contenedor.getById(id);
+  const productos = await productContainer.getById(id);
 
   if (productos) {
     return res.json(productos);
@@ -18,7 +20,7 @@ router.get("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
-  const result = await contenedor.deleteById(id);
+  const result = await productContainer.deleteById(id);
 
   if (!result) {
     return res.json({ error: "producto no encontrado" }, 404);
@@ -28,7 +30,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.delete("/", async (req, res) => {
-  const result = await contenedor.deleteAll();
+  const result = await productContainer.deleteAll();
 
   if (!result) {
     return res.json({ error: "no hay productos" }, 404);
@@ -40,7 +42,7 @@ router.delete("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   const body = req.body;
-  const productos = await contenedor.editById(id, body);
+  const productos = await productContainer.editById(id, body);
 
   if (productos) {
     return res.json(productos);
@@ -50,14 +52,14 @@ router.put("/:id", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const productos = await contenedor.getAll();
+  const productos = await productContainer.getAll();
   res.json(productos);
 });
 
 router.post("/", async (req, res) => {
   const body = req.body;
   const { title, price, thumbnail } = body;
-  const nuevoProducto = await contenedor.save({
+  const nuevoProducto = await productContainer.save({
     title,
     price,
     thumbnail,
