@@ -6,7 +6,6 @@ const getProductosFaker = () => {
     productos.push({
       title: faker.commerce.productName(),
       price: faker.commerce.price(),
-      thumbnail: faker.image.people(),
     });
   }
   return productos;

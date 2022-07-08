@@ -10,6 +10,17 @@
 </head>
 
 <body>
+
+    <% if(userName) { %>
+    <div class="container">
+        <div>
+            <h3>Bienvenido <%= userName%></h3>
+        </div>
+        <form action="/logoutAction" method="POST">
+            <button type="submit" class="btn btn-primary" id="logout">Logout</button>
+        </form>
+    </div>
+    <% } %>
     <div class="container">
         <h1 class="m-2">Lista de Productos</h1>
         <% if(listaProductos.length > 0) { %>
@@ -17,13 +28,11 @@
             <tr>
                 <th>Nombre</th>
                 <th>Precio</th>
-                <th>Foto</th>
             </tr>
             <% listaProductos.forEach( prod => { %>
             <tr>
                 <td><%= prod.title%></td>
                 <td>$ <%= prod.price%></td>
-                <td><img class="images" src="<%= prod.thumbnail%>"></td>
             </tr>
             <% }) %>
         </table>
