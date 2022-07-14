@@ -22,6 +22,11 @@ class ContenedorMongo {
     return record;
   }
 
+  async getByAttribute(attribute, value) {
+    const record = await this.collection.findOne({ [attribute]: value });
+    return record;
+  }
+
   async save(record) {
     try {
       const newRecord = await this.collection.create(record);

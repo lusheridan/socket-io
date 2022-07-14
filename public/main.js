@@ -1,7 +1,5 @@
 const socket = io();
-
 const divMessages = document.querySelector("#messages");
-
 const formChat = document.getElementById("formChat");
 const formProducts = document.getElementById("formProducts");
 

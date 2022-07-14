@@ -16,5 +16,9 @@ const messagesContainer = new Contenedor("mensajes", {
   },
   text: { type: String, required: true },
 });
+const usersContainer = new Contenedor("users", {
+  email: { type: String, required: true },
+  password: { type: String, required: true },
+});
 
-module.exports = { productContainer, messagesContainer };
+module.exports = { productContainer, messagesContainer, usersContainer };

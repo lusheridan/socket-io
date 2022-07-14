@@ -7,6 +7,8 @@ const { normalize, schema } = require("normalizr");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo");
+const passport = require("passport");
+const local = require("./passport/local");
 
 const { productContainer, messagesContainer } = require("./daos");
 const httpServer = http.createServer(app);
@@ -20,6 +22,13 @@ const PORT = 8080;
 httpServer.listen(PORT, () => {
   console.log(`Server on port ${PORT}`);
 });
+
+function isAuth(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/login");
+}
 
 app.set("view engine", "ejs");
 app.use(express.json());
@@ -41,6 +50,8 @@ app.use(
     },
   })
 );
+app.use(passport.initialize());
+app.use(passport.session());
 
 const authorSchema = new schema.Entity("authors");
 const messageSchema = new schema.Entity("messages", { author: authorSchema });
@@ -76,13 +87,24 @@ io.on("connection", async (socket) => {
   });
 });
 
-app.post("/createSession", (req, res) => {
-  req.session.user = req.body.user;
-  res.redirect("/productos");
-});
+app.post(
+  "/register",
+  passport.authenticate("register", {
+    failureRedirect: "/register",
+    successRedirect: "/productos",
+  })
+);
+
+app.post(
+  "/login",
+  passport.authenticate("login", {
+    successRedirect: "/productos",
+    failureRedirect: "/errorCredentials",
+  })
+);
 
 app.post("/logoutAction", (req, res) => {
-  const userName = req.session.user;
+  const userName = req.user.email;
   try {
     req.session.destroy((err) => {
       if (err) {
@@ -111,9 +133,21 @@ routerEjs.get("/login", async (req, res) => {
   res.render(`${__dirname}/views/ejs/login.ejs`);
 });
 
-routerEjs.get("/productos", async (req, res) => {
+routerEjs.get("/register", async (req, res) => {
+  res.render(`${__dirname}/views/ejs/register.ejs`);
+});
+
+routerEjs.get("/errorCredentials", async (req, res) => {
+  res.render(`${__dirname}/views/ejs/errorCredentials.ejs`);
+});
+
+routerEjs.get("/errorRegister", async (req, res) => {
+  res.render(`${__dirname}/views/ejs/errorRegister.ejs`);
+});
+
+routerEjs.get("/productos", isAuth, async (req, res) => {
   const listaProductos = getProductosFaker();
-  const userName = req.session.user;
+  const userName = req.user.email;
   res.render(`${__dirname}/views/ejs/listaProductos.ejs`, {
     listaProductos,
     userName,

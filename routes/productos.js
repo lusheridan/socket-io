@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const { productContainer } = require("../daos");
 const { getProductosFaker } = require("../productosFaker");
+const passport = require("passport");
 const router = Router();
 
 router.get("/productos-test", (req, res) => {
@@ -66,6 +67,34 @@ router.post("/", async (req, res) => {
   });
 
   res.json(nuevoProducto);
+});
+
+router.get("/register", (req, res) => {
+  res.render("register");
+});
+
+router.post(
+  "/register",
+  passport.authenticate("register", {
+    failureRedirect: "/errorRegister",
+    successRedirect: "/login",
+  })
+);
+
+router.get("/errorRegister", (req, res) => {
+  res.render("errorRegister");
+});
+
+router.post(
+  "/login",
+  passport.authenticate("login", {
+    failureRedirect: "/errorCredentials",
+    successRedirect: "/productos",
+  })
+);
+
+router.get("/errorCredentials", (req, res) => {
+  res.render("errorCredentials");
 });
 
 module.exports = router;
