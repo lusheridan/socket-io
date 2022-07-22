@@ -9,7 +9,10 @@ const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo");
 const passport = require("passport");
 const local = require("./passport/local");
+const yargs = require("yargs/yargs");
+const { hideBin } = require("yargs/helpers");
 
+const argv = yargs(hideBin(process.argv)).argv;
 const { productContainer, messagesContainer } = require("./daos");
 const httpServer = http.createServer(app);
 const { Server: ioServer } = require("socket.io");
@@ -19,8 +22,9 @@ const io = new ioServer(httpServer);
 dotenv.config();
 
 const PORT = 8080;
-httpServer.listen(PORT, () => {
-  console.log(`Server on port ${PORT}`);
+const currentPort = argv.port ? argv.port : PORT;
+httpServer.listen(currentPort, () => {
+  console.log(`Server on port ${currentPort}`);
 });
 
 function isAuth(req, res, next) {
@@ -84,6 +88,16 @@ io.on("connection", async (socket) => {
     });
     const normalized = await getNormalizedMessages();
     io.sockets.emit("messages", normalized);
+  });
+});
+
+app.get("/info", (req, res) => {
+  res.send({
+    sistemaOperativo: process.platform,
+    versionNode: process.version,
+    memoriaReservada: process.memoryUsage(),
+    processId: process.pid,
+    carpetaProyecto: process.cwd(),
   });
 });
 
