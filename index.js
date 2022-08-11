@@ -137,6 +137,10 @@ if (isCluster && cluster.isMaster) {
     });
   });
 
+  app.get("pruebaheroku", (req, res) => {
+    console.log("prueba heroku");
+  });
+
   app.post(
     "/register",
     passport.authenticate("register", {
