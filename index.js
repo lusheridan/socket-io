@@ -8,7 +8,6 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo");
 const passport = require("passport");
-const local = require("./passport/local");
 const yargs = require("yargs/yargs");
 const { hideBin } = require("yargs/helpers");
 const os = require("os");
