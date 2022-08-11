@@ -17,7 +17,7 @@ const compression = require("compression");
 const log4js = require("log4js");
 
 const argv = yargs(hideBin(process.argv)).argv;
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const currentPort = argv.port ? argv.port : PORT;
 const cpus = os.cpus().length;
 
