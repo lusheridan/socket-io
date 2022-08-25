@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { productContainer } = require("../daos");
+const productContainer = require("../services/daos/products");
 const { getProductosFaker } = require("../productosFaker");
 const passport = require("passport");
 const router = Router();

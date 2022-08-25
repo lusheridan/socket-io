@@ -28,7 +28,8 @@ if (isCluster && cluster.isMaster) {
     cluster.fork();
   }
 } else {
-  const { productContainer, messagesContainer } = require("./daos");
+  const productContainer = require("./services/daos/products");
+  const messagesContainer = require("./services/daos/messages");
   const httpServer = http.createServer(app);
   const { Server: ioServer } = require("socket.io");
   const { getProductosFaker } = require("./productosFaker");

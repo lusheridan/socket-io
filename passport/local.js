@@ -1,6 +1,6 @@
 const passport = require("passport");
 const { Strategy } = require("passport-local");
-const { usersContainer } = require("../daos");
+const usersContainer = require("../services/users");
 const bcrypt = require("bcrypt");
 const localStrategy = Strategy;
 
