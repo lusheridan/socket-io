@@ -20,7 +20,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = req.params.id;
   const result = await productContainer.deleteById(id);
 
   if (!result) {
@@ -41,7 +41,7 @@ router.delete("/", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = req.params.id;
   const body = req.body;
   const productos = await productContainer.editById(id, body);
 

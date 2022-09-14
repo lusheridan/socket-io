@@ -10,13 +10,17 @@
     "start:dev": "nodemon index.js",
     "start": "node index.js",
     "start:prof": "node --prof index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-axios": "node ./test/test.js",
+    "test-mocha": "mocha ./test/mocha.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@faker-js/faker": "^6.3.1",
+    "axios": "^0.21.4",
     "bcrypt": "^5.0.1",
+    "chai": "^4.3.6",
     "compression": "^1.7.4",
     "connect-mongo": "^4.6.0",
     "cookie-parser": "^1.4.6",
@@ -29,6 +33,7 @@
     "hbs": "^4.2.0",
     "knex": "^2.1.0",
     "log4js": "^6.6.1",
+    "mocha": "^10.0.0",
     "mongoose": "^6.4.0",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.15",
@@ -39,6 +44,7 @@
     "pug": "^3.0.2",
     "socket.io": "^4.5.1",
     "sqlite3": "^5.0.8",
+    "supertest": "^6.2.4",
     "yargs": "^17.5.1"
   }
 }
