@@ -14,6 +14,10 @@ const os = require("os");
 const cluster = require("cluster");
 const compression = require("compression");
 const log4js = require("log4js");
+const { graphqlHTTP } = require("express-graphql");
+const { makeExecutableSchema } = require("@graphql-tools/schema");
+const typeDefs = require("./graphql/schema.js");
+const resolvers = require("./graphql/resolvers.js");
 
 const argv = yargs(hideBin(process.argv)).argv;
 const PORT = process.env.PORT || 8080;
@@ -210,4 +214,15 @@ if (isCluster && cluster.isMaster) {
   });
 
   app.use("/", routerEjs);
+
+  app.use(
+    "/graphql",
+    graphqlHTTP({
+      schema: makeExecutableSchema({
+        typeDefs,
+        resolvers,
+      }),
+      graphiql: true,
+    })
+  );
 }
